@@ -1,0 +1,74 @@
+version: '3.7'
+
+networks:
+    default:
+        external:
+            name: ${COMPOSE_NETWORK}
+
+volumes:
+    docroot:
+        external:
+            name: ${COMPOSE_PROJECT_NAME}-docroot
+
+services:
+    nginx:
+        container_name: ${COMPOSE_PROJECT_NAME}_nginx
+        build:
+            context: ./nginx
+            args:
+                gid: ${GROUP_ID}
+                uid: ${USER_ID}
+        image: ${COMPOSE_PROJECT_NAME}_nginx
+        environment:
+            - VIRTUAL_HOST=${VIRTUAL_HOST}
+            - VIRTUAL_NETWORK=${COMPOSE_PROJECT_NAME}-network
+            - LETSENCRYPT_HOST=${VIRTUAL_HOST}
+            - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+            - docroot:/var/www:ro
+        ports:
+            - ${NGINX_PORT}:80
+        depends_on:
+            - php
+        logging:
+            driver: "json-file"
+            options: { max-size: "10m", max-file: "3" }
+        networks:
+            default:
+                aliases:
+                    - nginx.sf-host
+
+    php:
+        container_name: ${COMPOSE_PROJECT_NAME}_php
+        build:
+            context: ./php
+            args:
+                uid: ${COMPOSE_UID}
+                gid: ${COMPOSE_GID}
+        image: ${COMPOSE_PROJECT_NAME}/php_dev
+        volumes:
+            - docroot:/var/www:rw
+        depends_on:
+            - mysql
+            - elasticsearch
+            - redis
+        logging:
+            driver: json-file
+            options: { max-size: "2m", max-file: "3" }
+        networks:
+            default:
+                aliases:
+                    - php.sf-host
+
+    ftp:
+        container_name: ${COMPOSE_PROJECT_NAME}_ftp
+        image: atmoz/sftp:alpine
+        volumes:
+            - docroot:/home/www-data:rw
+        ports:
+            - ${FTP_PORT}:22
+        command: www-data:${FTP_PASSWORD}:${USER_ID}:${GROUP_ID}:web
+        logging:
+            driver: "json-file"
+            options: { max-size: "10m", max-file: "3" }

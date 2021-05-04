@@ -1,4 +1,4 @@
-docker-nginx-ftp
+docker-sf-host
 ===
 
-Dockerized web and ftp stack.
+Tiny symfony hosting stack for development purpose. 

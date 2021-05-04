@@ -64,7 +64,7 @@ services:
             - docroot:/home/www-data:rw
         ports:
             - ${FTP_PORT}:22
-        command: www-data:${FTP_PASSWORD}:${USER_ID}:${GROUP_ID}:web
+        command: www-data:${FTP_PASSWORD}:${USER_ID}:${GROUP_ID}:symfony
         logging:
             driver: "json-file"
             options: { max-size: "10m", max-file: "3" }

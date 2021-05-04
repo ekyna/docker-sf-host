@@ -28,7 +28,7 @@ services:
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf
             - docroot:/var/www:ro
         ports:
-            - ${NGINX_PORT}:80
+            - "${NGINX_PORT}:80"
         depends_on:
             - php
         logging:
@@ -44,8 +44,8 @@ services:
         build:
             context: ./php
             args:
-                uid: ${COMPOSE_UID}
-                gid: ${COMPOSE_GID}
+                uid: ${GROUP_ID}
+                gid: ${USER_ID}
         image: ${COMPOSE_PROJECT_NAME}/php_dev
         volumes:
             - docroot:/var/www:rw

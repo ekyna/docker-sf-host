@@ -49,10 +49,6 @@ services:
         image: ${COMPOSE_PROJECT_NAME}/php_dev
         volumes:
             - docroot:/var/www:rw
-        depends_on:
-            - mysql
-            - elasticsearch
-            - redis
         logging:
             driver: json-file
             options: { max-size: "2m", max-file: "3" }
